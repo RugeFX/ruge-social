@@ -1,14 +1,17 @@
-import { Optional, UUIDV4 } from "sequelize";
+import { Optional } from "sequelize";
 import {
   Table,
   Model,
   CreatedAt,
   Column,
-  DataType,
   UpdatedAt,
   ForeignKey,
   HasMany,
   BelongsTo,
+  DefaultScope,
+  Scopes,
+  PrimaryKey,
+  IsUUID,
 } from "sequelize-typescript";
 import Role from "./role.model";
 import Post from "./post.model";
@@ -23,9 +26,22 @@ export interface UserAttributes {
 
 type UserCreationAttributes = Optional<UserAttributes, "id" | "avatarUrl" | "role">;
 
+@DefaultScope(() => ({
+  attributes: { exclude: ["password"] },
+}))
+@Scopes(() => ({
+  withPassword: {
+    attributes: { include: ["password"] },
+  },
+  withRelations: {
+    include: [Role, Post],
+  },
+}))
 @Table
 class User extends Model<UserAttributes, UserCreationAttributes> {
-  @Column({ primaryKey: true, type: DataType.UUID, defaultValue: UUIDV4 })
+  @IsUUID(4)
+  @PrimaryKey
+  @Column
   id!: string;
 
   @Column({ unique: true })

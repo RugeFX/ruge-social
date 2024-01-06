@@ -1,14 +1,18 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import User from "../models/user.model";
-import { LoginInterface, RegisterInterface } from "../schemas/auth.schema";
+import { DecodedUserToken, LoginInterface, RegisterInterface } from "../schemas/auth.schema";
 import { comparePassword, cryptPassword } from "../lib/auth-utils";
 import ClientError from "../exceptions/ClientError";
+import User from "../models/user.model";
+import Role from "../models/role.model";
 
 export const getUserInfo = async (request: FastifyRequest, reply: FastifyReply) => {
-  const reqUser = request.user;
-  request.log.info({ reqUser });
+  const user = request.user as DecodedUserToken;
 
-  const userInfo = await User.findOne({ where: { id: reqUser } });
+  const userInfo = await User.findOne({
+    where: { id: user.id },
+    attributes: { exclude: ["password"] },
+    include: [Role],
+  });
 
   reply.status(200).send({ data: userInfo });
 };
@@ -34,7 +38,7 @@ export const loginUser =
       roleId,
     });
 
-    reply.status(200).send({ data: token });
+    reply.status(200).send({ data: { token } });
   };
 
 export const registerUser = async (

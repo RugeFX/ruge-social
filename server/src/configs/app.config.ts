@@ -15,6 +15,7 @@ export default async function buildFastifyApp() {
     },
   });
 
+  // TODO: Handle error logic
   app.setErrorHandler(async (error, request, reply) => {
     app.log.error(error.name);
     if (error instanceof ValidationError) {

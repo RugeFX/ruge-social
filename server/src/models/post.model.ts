@@ -1,4 +1,4 @@
-import { Optional, UUIDV4 } from "sequelize";
+import { Optional } from "sequelize";
 import {
   Column,
   CreatedAt,
@@ -8,6 +8,10 @@ import {
   ForeignKey,
   BelongsTo,
   Table,
+  IsUUID,
+  PrimaryKey,
+  DefaultScope,
+  Scopes,
 } from "sequelize-typescript";
 import User from "./user.model";
 
@@ -20,9 +24,16 @@ export interface PostAttributes {
 
 type PostCreationAttributes = Optional<PostAttributes, "id" | "title">;
 
+@Scopes(() => ({
+  withRelations: {
+    include: [User],
+  },
+}))
 @Table
 class Post extends Model<PostAttributes, PostCreationAttributes> {
-  @Column({ primaryKey: true, type: DataType.UUID, defaultValue: UUIDV4 })
+  @IsUUID(4)
+  @PrimaryKey
+  @Column
   id!: string;
 
   @Column({ allowNull: true, defaultValue: "Untitled post" })

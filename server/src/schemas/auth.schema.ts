@@ -1,4 +1,9 @@
+import type { FastifySchema } from "fastify";
 import S from "fluent-json-schema";
+
+export interface DecodedUserToken {
+  id: string;
+}
 
 export interface LoginInterface {
   Body: {
@@ -14,16 +19,16 @@ export interface RegisterInterface {
   };
 }
 
-export const loginSchema = {
+export const loginSchema: FastifySchema = {
   body: S.object().prop("username", S.string().required()).prop("password", S.string().required()),
-  queryString: S.object(),
+  querystring: S.object(),
   params: S.object(),
   headers: S.object(),
 };
 
-export const registerSchema = {
+export const registerSchema: FastifySchema = {
   body: S.object().prop("username", S.string().required()).prop("password", S.string().required()),
-  queryString: S.object(),
+  querystring: S.object(),
   params: S.object(),
   headers: S.object(),
 };
